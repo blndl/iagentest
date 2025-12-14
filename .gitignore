@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS
+.DS_Store
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Python virtual environments
+venv/
+.env/
+.venv/
+
+# Logs
+*.log
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
