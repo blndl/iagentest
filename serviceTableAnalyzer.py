@@ -9,6 +9,25 @@ class ServiceTableAnalyzer:
         self.parent = parent
         self.frame = tk.Frame(parent)
         self.frame.pack(expand=True, fill="both")
+        self.currentData = df
+        self.sortColumn = None
+        self.sortReverse = False
+        
+        # Mapping of original column names to display names
+        self.columnNames = {
+            "session_id": "ID",
+            "date": "Date",
+            "service": "Service",
+            "langue": "Language",
+            "duree_minutes": "Duration (min)",
+            "interactions_patient": "Patient Int.",
+            "interactions_praticien": "Doctor Int.",
+            "interactions_totales": "Total Int.",
+            "note_praticien": "Rating",
+            "qualite_score": "Quality",
+            "segments_non_reconnus": "Errors",
+            "device": "Device"
+        }
 
         self.filterVar = tk.StringVar()
         services = ["All"] + sorted(df[self.filterColumn].dropna().unique())
@@ -30,7 +49,8 @@ class ServiceTableAnalyzer:
     def setupTable(self):
         self.tree["columns"] = list(self.df.columns)
         for col in self.df.columns:
-            self.tree.heading(col, text=col)
+            displayName = self.columnNames.get(col, col)
+            self.tree.heading(col, text=displayName, command=lambda c=col: self.sortBy(c))
             self.tree.column(col, width=100, anchor="center")
 
     def populateTable(self, data):
@@ -41,7 +61,17 @@ class ServiceTableAnalyzer:
     def updateTable(self, event=None):
         selected = self.filterVar.get()
         if selected == "All":
-            filtered = self.df
+            self.currentData = self.df
         else:
-            filtered = self.df[self.df[self.filterColumn] == selected]
-        self.populateTable(filtered)
+            self.currentData = self.df[self.df[self.filterColumn] == selected]
+        self.populateTable(self.currentData)
+    
+    def sortBy(self, col):
+        if self.sortColumn == col:
+            self.sortReverse = not self.sortReverse
+        else:
+            self.sortColumn = col
+            self.sortReverse = False
+        
+        sortedData = self.currentData.sort_values(by=col, ascending=not self.sortReverse)
+        self.populateTable(sortedData)
